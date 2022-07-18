@@ -1,10 +1,11 @@
 %lang starknet
 
-from starkware.cairo.common.uint256 import Uint256, uint256_lt, uint256_eq, uint256_add
+from starkware.cairo.common.uint256 import Uint256, uint256_lt, uint256_eq, uint256_add, uint256_le
 from openzeppelin.token.erc721_enumerable.library import (
     ERC721_Enumerable_mint,
     ERC721_Enumerable_totalSupply,
 )
+from openzeppelin.utils.constants import TRUE, FALSE
 from starkware.starknet.common.syscalls import get_caller_address
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.alloc import alloc
@@ -51,7 +52,7 @@ func Degensplit_get_debts{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, rang
     local debts_len = 0
     let start = Uint256(0, 0)
     let (stop) = ERC721_Enumerable_totalSupply()
-    let (_is_zero) = uint256_eq(stop, Uint256(0, 0))
+    let (_is_zero) = uint256_eq(start, stop)
     if _is_zero == 1:
         return (debts_len, debts)
     end
@@ -68,19 +69,23 @@ func _get_debts_loop{
     pedersen_ptr : HashBuiltin*,
     range_check_ptr,
 }(token_id : Uint256):
-    let (_next_iter) = uint256_lt(token_id, stop)
-    if _next_iter == 0:
+    let (_stop_iter) = uint256_le(stop, token_id)
+    if _stop_iter == TRUE:
         return ()
     end
 
     let (token_data) = Degensplit_lendings.read(token_id)
     if token_data.borrower == user:
-        assert [debts] = token_id
-        tempvar debts = debts + Uint256.SIZE
+        assert [debts + debts_len * Uint256.SIZE] = token_id
         tempvar debts_len = debts_len + 1
+        tempvar range_check_ptr = range_check_ptr
+        tempvar syscall_ptr = syscall_ptr
+        tempvar pedersen_ptr = pedersen_ptr
     else:
-        tempvar debts = debts
         tempvar debts_len = debts_len
+        tempvar range_check_ptr = range_check_ptr
+        tempvar syscall_ptr = syscall_ptr
+        tempvar pedersen_ptr = pedersen_ptr
     end
     let (next_token_id, _) = uint256_add(token_id, Uint256(1, 0))
     _get_debts_loop(next_token_id)

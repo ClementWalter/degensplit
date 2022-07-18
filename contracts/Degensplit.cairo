@@ -34,6 +34,7 @@ func addLending{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_pt
     return ()
 end
 
+@view
 func getDebts{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(user : felt) -> (
     debts_len : felt, debts : felt*
 ):

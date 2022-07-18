@@ -13,6 +13,7 @@ from constants import CONTRACTS
 PUBLIC_KEY = private_to_stark_key(int(os.environ["PRIVATE_KEY"]))
 NETWORK = "127.0.0.1"
 OWNER = int(next(load(str(PUBLIC_KEY), NETWORK))["address"], 16)
+BORROWER = OWNER + 1
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -37,10 +38,9 @@ class TestDegensplit:
         @staticmethod
         async def test_should_mint_lending_token(degensplit: StarknetContract):
             balance_before = (await degensplit.balanceOf(OWNER).call()).result.balance
-            borrower = OWNER + 1
             amount = 10
             symbol = int("usd".encode().hex(), 16)
-            await degensplit.addLending(borrower, amount, symbol).invoke(
+            await degensplit.addLending(BORROWER, amount, symbol).invoke(
                 caller_address=OWNER
             )
             balance_after = (await degensplit.balanceOf(OWNER).call()).result.balance
@@ -49,6 +49,12 @@ class TestDegensplit:
                 await degensplit.tokenOfOwnerByIndex(OWNER, balance_before).call()
             ).result.tokenId
             token_data = (await degensplit.getLending(token_id).call()).result.tokenData
-            assert token_data.borrower == borrower
+            assert token_data.borrower == BORROWER
             assert token_data.amount == amount
             assert token_data.symbol == symbol
+
+    class TestGetDebts:
+        @staticmethod
+        async def test_should_return_user_debts(degensplit: StarknetContract):
+            debts = (await degensplit.getDebts(BORROWER).call()).result.debts
+            assert debts == [0]
