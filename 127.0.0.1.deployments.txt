@@ -1,0 +1,1 @@
+0x0006b21acb24e5a053a4f1046d10659bf8ac890f2d5b509aa3d99d8dbd390232:/Users/clementwalter/.pyenv/versions/3.9.13/envs/degensplit/lib/python3.9/site-packages/nile/artifacts/abis/Account.json:account-0
