@@ -6,11 +6,13 @@ from openzeppelin.token.erc721.library import _exists
 from openzeppelin.utils.constants import TRUE, FALSE
 from starkware.cairo.common.uint256 import Uint256
 from starkware.cairo.common.cairo_builtins import HashBuiltin
+from starkware.cairo.common.dict import DictAccess
 
 from contracts.library import (
     Degensplit_add_lending,
     Degensplit_get_lending,
     Degensplit_get_debts,
+    Degensplit_get_group_balance,
     TokenData,
 )
 
@@ -40,4 +42,12 @@ func getDebts{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}
 ):
     let (debts_len, debts) = Degensplit_get_debts(user)
     return (debts_len, debts)
+end
+
+@view
+func getGroupBalance{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    users_len : felt, users : felt*
+) -> (balances_len : felt, balances : DictAccess*):
+    let (balances_len, balances) = Degensplit_get_group_balance(users_len, users)
+    return (balances_len, balances)
 end

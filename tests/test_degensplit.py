@@ -1,7 +1,6 @@
-from lib2to3.pgen2 import token
 import os
-import pytest
 
+import pytest
 import pytest_asyncio
 from nile.accounts import load
 from starkware.crypto.signature.signature import private_to_stark_key
@@ -58,3 +57,15 @@ class TestDegensplit:
         async def test_should_return_user_debts(degensplit: StarknetContract):
             debts = (await degensplit.getDebts(BORROWER).call()).result.debts
             assert debts == [0]
+
+    class TestGetGroupBalance:
+        @staticmethod
+        async def test_should_return_group_balance(degensplit: StarknetContract):
+            symbol = int("usd".encode().hex(), 16)
+            await degensplit.addLending(OWNER, 100, symbol).invoke(
+                caller_address=BORROWER
+            )
+            group_balance = (
+                await degensplit.getGroupBalance([OWNER, BORROWER]).call()
+            ).result.balances
+            assert len(group_balance) == 2
