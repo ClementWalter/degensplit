@@ -1,15 +1,11 @@
-import os
-
 import pytest
 import pytest_asyncio
 from nile.accounts import load
-from starkware.crypto.signature.signature import private_to_stark_key
 from starkware.starknet.compiler.compile import compile_starknet_files
 from starkware.starknet.testing.starknet import Starknet, StarknetContract
 
-from constants import CONTRACTS
+from constants import CONTRACTS, PUBLIC_KEY
 
-PUBLIC_KEY = private_to_stark_key(int(os.environ["PRIVATE_KEY"]))
 NETWORK = "127.0.0.1"
 OWNER = int(next(load(str(PUBLIC_KEY), NETWORK))["address"], 16)
 BORROWER = OWNER + 1

@@ -1,1 +1,2 @@
 0x020d288374979f57461740ae89f4c954c9e69d802cfa48760ab32534e17179ef:/Users/clementwalter/.pyenv/versions/3.9.13/envs/degensplit/lib/python3.9/site-packages/nile/artifacts/abis/Account.json:account-0
+0x03125d10deef7db705b4f9a1392586a0f03adbae0c01b3e8cccc1c3da227ca95:artifacts/abis/Degensplit.json:degensplit
