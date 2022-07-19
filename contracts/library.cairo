@@ -5,6 +5,7 @@ from openzeppelin.token.erc721_enumerable.library import (
     ERC721_Enumerable_mint,
     ERC721_Enumerable_totalSupply,
     ERC721_Enumerable_tokenOfOwnerByIndex,
+    ERC721_Enumerable_tokenByIndex,
     ERC721_balanceOf,
 )
 from openzeppelin.utils.constants import TRUE, FALSE
@@ -95,12 +96,13 @@ func _get_debts_loop{
     syscall_ptr : felt*,
     pedersen_ptr : HashBuiltin*,
     range_check_ptr,
-}(token_id : Uint256):
-    let (_stop_iter) = uint256_le(stop, token_id)
+}(index : Uint256):
+    let (_stop_iter) = uint256_le(stop, index)
     if _stop_iter == TRUE:
         return ()
     end
 
+    let (token_id) = ERC721_Enumerable_tokenByIndex(index)
     let (token_data) = Degensplit_lendings.read(token_id)
     if token_data.borrower == user:
         assert [debts + debts_len * Uint256.SIZE] = token_id
@@ -114,8 +116,8 @@ func _get_debts_loop{
         tempvar syscall_ptr = syscall_ptr
         tempvar pedersen_ptr = pedersen_ptr
     end
-    let (next_token_id, _) = uint256_add(token_id, Uint256(1, 0))
-    _get_debts_loop(next_token_id)
+    let (next_index, _) = uint256_add(index, Uint256(1, 0))
+    _get_debts_loop(next_index)
     return ()
 end
 
